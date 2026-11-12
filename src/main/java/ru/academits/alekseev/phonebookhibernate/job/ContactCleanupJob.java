@@ -1,27 +1,21 @@
 package ru.academits.alekseev.phonebookhibernate.job;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import ru.academits.alekseev.phonebookhibernate.entity.Contact;
-import ru.academits.alekseev.phonebookhibernate.repository.ContactsRepository;
-
-import java.util.List;
-import java.util.Random;
+import ru.academits.alekseev.phonebookhibernate.service.ContactsService;
 
 @Slf4j
 @Component
 public class ContactCleanupJob {
-    private final ContactsRepository contactsRepository;
-    private static final Random random = new Random();
+    private final ContactsService contactsService;
 
-    public ContactCleanupJob(ContactsRepository contactsRepository) {
-        this.contactsRepository = contactsRepository;
+    public ContactCleanupJob(ContactsService contactsService) {
+        this.contactsService = contactsService;
     }
 
-    public void cleanup(List<Contact> contacts) {
-        Contact contact = contacts.get(random.nextInt(contacts.size()));
-
-        contactsRepository.deleteById(contact.getId());
-        log.info("Deleted contact {}", contact.getId());
+    @Scheduled(fixedRate = 10000)
+    public void cleanup() {
+        contactsService.deleteRandomContact();
     }
 }

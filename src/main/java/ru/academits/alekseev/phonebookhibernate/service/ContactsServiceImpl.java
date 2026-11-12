@@ -1,28 +1,26 @@
 package ru.academits.alekseev.phonebookhibernate.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import ru.academits.alekseev.phonebookhibernate.converter.ContactsConverter;
 import ru.academits.alekseev.phonebookhibernate.entity.Contact;
 import ru.academits.alekseev.phonebookhibernate.repository.ContactsRepository;
 import ru.academits.alekseev.phonebookhibernate.dto.BaseResponse;
 import ru.academits.alekseev.phonebookhibernate.dto.ContactDto;
-import ru.academits.alekseev.phonebookhibernate.job.ContactCleanupJob;
 
 import java.util.List;
+import java.util.Random;
 
 @Slf4j
 @Service
 public class ContactsServiceImpl implements ContactsService {
     private final ContactsRepository contactsRepository;
     private final ContactsConverter contactsConverter;
-    private final ContactCleanupJob contactCleanupJob;
+    private static final Random random = new Random();
 
-    public ContactsServiceImpl(ContactsRepository contactsRepository, ContactsConverter contactsConverter, ContactCleanupJob contactCleanupJob) {
+    public ContactsServiceImpl(ContactsRepository contactsRepository, ContactsConverter contactsConverter) {
         this.contactsRepository = contactsRepository;
         this.contactsConverter = contactsConverter;
-        this.contactCleanupJob = contactCleanupJob;
     }
 
     @Override
@@ -82,6 +80,21 @@ public class ContactsServiceImpl implements ContactsService {
         return BaseResponse.success();
     }
 
+    @Override
+    public void  deleteRandomContact() {
+        List<Contact> contacts = contactsRepository.findAll();
+
+        if (contacts.isEmpty()) {
+            log.info("No contacts found");
+            return;
+        }
+
+        Contact randomContact = contacts.get(random.nextInt(contacts.size()));
+        contactsRepository.deleteById(randomContact.getId());
+
+        log.info("deleteContact({})", randomContact);
+    }
+
     private BaseResponse validateContact(ContactDto contact) {
         if (contact == null) {
             return BaseResponse.error("Contact is null");
@@ -119,17 +132,5 @@ public class ContactsServiceImpl implements ContactsService {
         }
 
         return BaseResponse.success();
-    }
-
-    @Scheduled(fixedRate = 10000)
-    public void cleanup() {
-        List<Contact> contacts = contactsRepository.findAll();
-
-        if (contacts.isEmpty()) {
-            log.info("No contacts found");
-            return;
-        }
-
-        contactCleanupJob.cleanup(contacts);
     }
 }

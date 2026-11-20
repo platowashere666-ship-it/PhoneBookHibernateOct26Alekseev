@@ -1,4 +1,4 @@
-package ru.academits.alekseev.phonebookhibernate.security;
+package ru.academits.alekseev.phonebookhibernate.security.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -13,6 +13,13 @@ public class ContactsConverter implements Converter<Contact, ContactDto> {
 
     @Override
     public Contact convertToModel(ContactDto dto) {
-        return new Contact(dto.getId(), dto.getSurname(), dto.getName(), dto.getPhone());
+        Contact contact = new Contact();
+
+        contact.setId(dto.getId());
+        contact.setSurname(dto.getSurname());
+        contact.setName(dto.getName());
+        contact.setPhone(dto.getPhone());
+
+        return contact;
     }
 }

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.academits.alekseev.phonebookhibernate.security.entity.ApplicationUser;
 
 @Data
 @NoArgsConstructor
@@ -22,4 +23,8 @@ public class Contact {
 
     @Column(nullable = false, length = 100, unique = true)
     private String phone;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private ApplicationUser user;
 }
